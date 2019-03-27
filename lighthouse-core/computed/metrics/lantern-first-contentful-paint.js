@@ -40,7 +40,7 @@ class LanternFirstContentfulPaint extends LanternMetric {
    *    should also be included in our blocking node IDs set.
    * @return {{definitelyNotRenderBlockingScriptUrls: Set<string>, blockingCpuNodeIds: Set<string>}}
    */
-  static getBlockingCpuData(
+  static getBlockingNodeData(
       graph,
       filterTimestamp,
       blockingScriptFilter,
@@ -57,7 +57,7 @@ class LanternFirstContentfulPaint extends LanternMetric {
         // We use startTime here because the paint event can be *inside* the task that was render blocking.
         if (node.startTime <= filterTimestamp) cpuNodes.push(node);
 
-        // Make sure we still build our script URL to node map.
+        // Build our script URL map to find the earliest EvaluateScript task node.
         const scriptUrls = node.getEvaluateScriptURLs();
         for (const url of scriptUrls) {
           // Use the earliest CPU node we find.
@@ -80,13 +80,13 @@ class LanternFirstContentfulPaint extends LanternMetric {
     /** @type {Set<string>} */
     const blockingCpuNodeIds = new Set();
     for (const url of possiblyRenderBlockingScriptUrls) {
-      // Lookup the CPU node that had the EvaluateScript for this URL.
+      // Lookup the CPU node that had the earliest EvaluateScript for this URL.
       const cpuNodeForUrl = scriptUrlToNodeMap.get(url);
 
-      // If we can't find it at all, we'll assume it was render-blocking.
+      // If we can't find it at all, we can't conclude anything, so just skip it.
       if (!cpuNodeForUrl) continue;
 
-      // If we found it and it was in our `cpuNodes` set that means it finished before filterTimestamp, we're good.
+      // If we found it and it was in our `cpuNodes` set that means it finished before filterTimestamp, so it really is render-blocking.
       if (cpuNodes.includes(cpuNodeForUrl)) {
         blockingCpuNodeIds.add(cpuNodeForUrl.id);
         continue;
@@ -140,7 +140,7 @@ class LanternFirstContentfulPaint extends LanternMetric {
     const {
       definitelyNotRenderBlockingScriptUrls,
       blockingCpuNodeIds,
-    } = this.getBlockingCpuData(
+    } = this.getBlockingNodeData(
       dependencyGraph,
       paintTs,
       blockingResourcesFilter,
@@ -149,7 +149,7 @@ class LanternFirstContentfulPaint extends LanternMetric {
 
     return dependencyGraph.cloneWithRelationships(node => {
       if (node.type === BaseNode.TYPES.NETWORK) {
-        // Exclude all nodes that ended after FCP (except for the main document which we always consider necessary)
+        // Exclude all nodes that ended after paintTs (except for the main document which we always consider necessary)
         if (node.endTime > paintTs && !node.isMainDocument()) return false;
 
         const url = node.record.url;
