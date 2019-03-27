@@ -46,7 +46,7 @@ class LanternFirstContentfulPaint extends LanternMetric {
       blockingScriptFilter,
       extraBlockingCpuNodesToIncludeFilter
   ) {
-    /** @type {Map<string, CPUNode>} */
+    /** @type {Map<string, CPUNode>} A map of blocking script URLs to the earliest EvaluateScript task node that executed them. */
     const scriptUrlToNodeMap = new Map();
 
     /** @type {Array<CPUNode>} */
