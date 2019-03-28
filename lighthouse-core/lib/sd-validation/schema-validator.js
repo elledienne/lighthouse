@@ -25,8 +25,7 @@ function cleanName(uri) {
 function getPropsForType(type) {
   const cleanType = cleanName(type);
   const props = schemaStructure.properties
-    .filter(prop =>
-      prop.parent.includes(cleanType))
+    .filter(prop => prop.parent.includes(cleanType))
     .map(prop => prop.name);
   const foundType = findType(type);
   if (!foundType) throw new Error(`Unable to get props for missing type "${type}"`);
@@ -54,14 +53,10 @@ function findType(type) {
  */
 function validateObjectKeys(typeOrTypes, keys) {
   /** @type {Array<string>} */
-  const errors = [];
-  /** @type {Array<string>} */
-  const safelist = [];
-
   let types = [];
 
   if (typeof typeOrTypes === 'string') {
-    types.push(typeOrTypes);
+    types = [typeOrTypes];
   } else if (Array.isArray(typeOrTypes)) {
     types = typeOrTypes;
   } else {
@@ -71,20 +66,18 @@ function validateObjectKeys(typeOrTypes, keys) {
   const unknownTypes = types.filter(t => !findType(t));
 
   if (unknownTypes.length) {
-    unknownTypes
-      .forEach(type => {
-        if (SCHEMA_ORG_URL_REGEX.test(type)) {
-          errors.push(`Unrecognized schema.org type ${type}`);
-        }
-      });
-
-    return errors;
+    return unknownTypes
+      .filter(type => SCHEMA_ORG_URL_REGEX.test(type))
+      .map(type => `Unrecognized schema.org type ${type}`);
   }
+
+  /** @type {Set<string>} */
+  const allKnownProps = new Set();
 
   types.forEach(type => {
     const knownProps = getPropsForType(type);
 
-    knownProps.forEach(key => safelist.push(key));
+    knownProps.forEach(key => allKnownProps.add(key));
   });
 
   const cleanKeys = keys
@@ -92,13 +85,11 @@ function validateObjectKeys(typeOrTypes, keys) {
     .filter(key => key.indexOf('@') !== 0)
     .map(key => cleanName(key));
 
-  cleanKeys
+  return cleanKeys
     // remove Schema.org input/output constraints http://schema.org/docs/actions.html#part-4
     .map(key => key.replace(/-(input|output)$/, ''))
-    .filter(key => !safelist.includes(key))
-    .forEach(key => errors.push(`Unexpected property "${key}"`));
-
-  return errors;
+    .filter(key => !allKnownProps.has(key))
+    .map(key => `Unexpected property "${key}"`);
 }
 
 /**
@@ -124,7 +115,12 @@ module.exports = function validateSchemaOrg(expandedObj) {
       keyErrorMessages.forEach(message =>
         errors.push({
           // get rid of the first chunk (/@type) as it's the same for all errors
-          path: '/' + path.slice(0, -1).map(cleanName).join('/'),
+          path:
+            '/' +
+            path
+              .slice(0, -1)
+              .map(cleanName)
+              .join('/'),
           message,
         })
       );
