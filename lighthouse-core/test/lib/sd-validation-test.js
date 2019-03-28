@@ -8,7 +8,7 @@
 /* eslint-env jest */
 
 const assert = require('assert');
-const validateJSONLD = require('../');
+const validateJSONLD = require('../../lib/sd-validation/index.js');
 
 describe('JSON validation', () => {
   it('reports missing closing bracket', async () => {

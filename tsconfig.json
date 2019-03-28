@@ -15,7 +15,6 @@
   "include": [
     "lighthouse-cli/**/*.js",
     "lighthouse-core/**/*.js",
-    "sd-validation/**/*.js",
     "clients/**/*.js",
     "build/**/*.js",
     "./types/**/*.d.ts",

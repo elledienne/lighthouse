@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const {URL} = require('../lighthouse-core/lib/url-shim.js');
+const {URL} = require('../url-shim.js');
 const jsonld = require('jsonld');
 const schemaOrgContext = require('./assets/jsonldcontext.json');
 const SCHEMA_ORG_HOST = 'schema.org';
