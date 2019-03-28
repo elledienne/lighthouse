@@ -16,17 +16,11 @@ const fs = require('fs');
 const SCHEMA_ORG_URL = 'https://schema.org/version/latest/schema.jsonld';
 const SCHEMA_TREE_FILE = path.join(__dirname, '../assets/schema-tree.json');
 
-/**
- * @typedef {import('jsonlint-mod').SchemaTreeItem} SchemaDefinition
- */
+/** @typedef {import('jsonlint-mod').SchemaTreeItem} SchemaDefinition */
 
-/**
- * @typedef {import('jsonlint-mod').JSONSchemaSource} SchemaSource
- */
+/** @typedef {import('jsonlint-mod').JSONSchemaSource} SchemaSource */
 
-/**
- * @typedef {{'@id': string}} IDRef
- */
+/** @typedef {{'@id': string}} IDRef */
 
 /**
  * @param {SchemaSource} data

@@ -5,10 +5,10 @@
  */
 'use strict';
 
-const parseJSON = require('./json.js');
-const validateJsonLD = require('./jsonld.js');
-const expandAsync = require('./expand.js');
-const validateSchemaOrg = require('./schema.js');
+const parseJSON = require('./json-linter.js');
+const validateJsonLD = require('./jsonld-keyword-validator.js');
+const expandAsync = require('./json-expander.js');
+const validateSchemaOrg = require('./schema-validator.js');
 
 /** @typedef {'json'|'json-ld'|'json-ld-expand'|'schema-org'} ValidatorType */
 
@@ -25,7 +25,7 @@ module.exports = async function validate(textInput) {
   if (parseError) {
     return [{
       validator: 'json',
-      path: parseError.line,
+      path: parseError.lineNumber,
       message: parseError.message,
     }];
   }

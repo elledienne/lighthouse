@@ -25,9 +25,9 @@ function cleanName(uri) {
 function getPropsForType(type) {
   const cleanType = cleanName(type);
   const props = schemaStructure.properties
-    .filter((/** @type {{name: string, parent: Array<string>}} */ prop) =>
+    .filter(prop =>
       prop.parent.includes(cleanType))
-    .map((/** @type {{name: string, parent: Array<string>}} */ prop) => prop.name);
+    .map(prop => prop.name);
   const foundType = findType(type);
   if (!foundType) throw new Error(`Unable to get props for missing type "${type}"`);
   const parentTypes = foundType.parent;
@@ -43,14 +43,6 @@ function findType(type) {
   const cleanType = cleanName(type);
 
   return schemaStructure.types.find(typeObj => typeObj.name === cleanType);
-}
-
-/**
- * @param {string} type
- * @returns {boolean}
- */
-function isUnknownType(type) {
-  return !findType(type);
 }
 
 /**
@@ -76,7 +68,7 @@ function validateObjectKeys(typeOrTypes, keys) {
     return ['Unknown value type'];
   }
 
-  const unknownTypes = types.filter(t => isUnknownType(t));
+  const unknownTypes = types.filter(t => !findType(t));
 
   if (unknownTypes.length) {
     unknownTypes

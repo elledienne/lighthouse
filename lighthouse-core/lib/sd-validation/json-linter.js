@@ -9,14 +9,14 @@ const jsonlint = require('jsonlint-mod');
 
 /**
  * @param {string} input
- * @returns {{message: string, line: string|null}|null}
+ * @returns {{message: string, lineNumber: string|null}|null}
  */
 module.exports = function parseJSON(input) {
   try {
     jsonlint.parse(input);
   } catch (error) {
+    /** @type {string|null} */
     let line = error.at;
-    let message = error.message;
 
     // extract line number from message
     if (!line) {
@@ -27,10 +27,12 @@ module.exports = function parseJSON(input) {
       }
     }
 
+
     // jsonlint error message points to a specific character, but we just want the message.
     // Example:
     //    ---------^
     //    Unexpected character {
+    let message = /** @type {string} */ (error.message);
     const regexMessageResult = error.message.match(/-+\^\n(.+)$/);
 
     if (regexMessageResult) {
@@ -39,7 +41,7 @@ module.exports = function parseJSON(input) {
 
     return {
       message,
-      line,
+      lineNumber: line,
     };
   }
 
