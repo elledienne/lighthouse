@@ -321,6 +321,9 @@ module.exports = class NetworkRequest {
     const totalFetchedSize = this.responseHeaders.find(item => item.name === 'X-TotalFetchedSize');
     // Bail if the header was missing.
     if (!totalFetchedSize) return;
+    const floatValue = parseFloat(totalFetchedSize.value);
+    // Bail if the header cannot be parsed
+    if (isNaN(floatValue)) return;
     this.transferSize = parseFloat(totalFetchedSize.value);
   }
 
