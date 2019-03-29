@@ -193,6 +193,7 @@ module.exports = class NetworkRequest {
 
     this._updateResponseReceivedTimeIfNecessary();
     this._updateTransferSizeForLightrider();
+    this._updateFetchStatsForLightrider();
   }
 
   /**
@@ -211,6 +212,7 @@ module.exports = class NetworkRequest {
 
     this._updateResponseReceivedTimeIfNecessary();
     this._updateTransferSizeForLightrider();
+    this._updateFetchStatsForLightrider();
   }
 
   /**
@@ -320,6 +322,65 @@ module.exports = class NetworkRequest {
     // Bail if the header was missing.
     if (!totalFetchedSize) return;
     this.transferSize = parseFloat(totalFetchedSize.value);
+  }
+
+  _updateFetchStatsForLightrider() {
+    // Bail if we somehow already have fetch stats.
+    if (!global.isLightrider) return;
+
+    // For more info on timing nomenclature: https://www.w3.org/TR/resource-timing-2/#processing-model
+
+    //    StartTime
+    //    | ConnectStart
+    //    | |     SSLStart  SSLEnd
+    //    | |     |         | ConnectEnd
+    //    | |     |         | | SendStart & SendEnd  ReceiveHeadersEnd
+    //    | |     |         | | |                    |           EndTime
+    //    ▼ ▼     ▼         ▼ ▼ ▼                    ▼           ▼
+    //    [ [TCP  [   SSL   ] ] [   Request   ] [   Response   ] ]
+    //    ▲ ▲     ▲         ▲ ▲ ▲             ▲ ▲              ▲ ▲
+    //    | |     '-SSLTime-' | '-requestTime-' '-responseTime-' |
+    //    | '----TCPTime------'                                  |
+    //    |                                                      |
+    //    '------------------------TotalTime---------------------'
+
+    const totalTimeHeader = this.responseHeaders.find(item => item.name === 'X-TotalTime');
+    // Bail if there was no totalTime.
+    if (!totalTimeHeader) return;
+
+    const totalTime = parseInt(totalTimeHeader.value);
+
+    const TCPTimeHeader = this.responseHeaders.find(item => item.name === 'X-TCPTime');
+    const requestTimeHeader = this.responseHeaders.find(item => item.name === 'X-RequestTime');
+    const SSLTimeHeader = this.responseHeaders.find(item => item.name === 'X-SSLTime');
+    const responseTimeHeader = this.responseHeaders.find(item => item.name === 'X-ResponseTime');
+
+    const TCPTime = TCPTimeHeader === undefined ? 0 : parseInt(TCPTimeHeader.value);
+    const requestTime = requestTimeHeader === undefined ? 0 : parseInt(requestTimeHeader.value);
+    const SSLTime = SSLTimeHeader === undefined ? 0 : parseInt(SSLTimeHeader.value);
+    const responseTime = responseTimeHeader === undefined ? 0 : parseInt(responseTimeHeader.value);
+
+    // Bail if the timings don't add up.
+    if (TCPTime + requestTime + responseTime !== totalTime) {
+      return;
+    }
+
+    // Bail if timing is not initialized.
+    if (!this.timing) {
+      return;
+    }
+
+    // EndTime and responseReceivedTime are in seconds, so conversion is necessary
+    this.endTime = this.startTime + (totalTime / 1000);
+    this.responseReceivedTime = this.startTime + ((TCPTime + requestTime) / 1000);
+
+    this.timing.connectStart = 0;
+    this.timing.connectEnd = TCPTime;
+    this.timing.sslStart = TCPTime - SSLTime;
+    this.timing.sslEnd = TCPTime;
+    this.timing.sendStart = TCPTime;
+    this.timing.sendEnd = TCPTime;
+    this.timing.receiveHeadersEnd = TCPTime + requestTime;
   }
 
   /**
