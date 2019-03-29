@@ -334,9 +334,9 @@ module.exports = class NetworkRequest {
     //    | ConnectStart
     //    | |     SSLStart  SSLEnd
     //    | |     |         | ConnectEnd
-    //    | |     |         | | SendStart & SendEnd  ReceiveHeadersEnd
-    //    | |     |         | | |                    |           EndTime
-    //    ▼ ▼     ▼         ▼ ▼ ▼                    ▼           ▼
+    //    | |     |         | | SendStart/End   ReceiveHeadersEnd
+    //    | |     |         | | |               |                EndTime
+    //    ▼ ▼     ▼         ▼ ▼ ▼               ▼                ▼
     //    [ [TCP  [   SSL   ] ] [   Request   ] [   Response   ] ]
     //    ▲ ▲     ▲         ▲ ▲ ▲             ▲ ▲              ▲ ▲
     //    | |     '-SSLTime-' | '-requestTime-' '-responseTime-' |
