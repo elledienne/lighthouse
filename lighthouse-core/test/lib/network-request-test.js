@@ -17,11 +17,6 @@ describe('network request', function() {
     return req;
   }
 
-  it('initializes request onRequestWillBeSent', function() {
-    const req = new NetworkRequest();
-    req.onRequestWillBeSent({});
-  });
-
   describe('update transfer size for lightrider', function() {
     it('does nothing if not Lightrider', function() {
       const req = getRequest();
