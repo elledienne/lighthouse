@@ -13,7 +13,7 @@ describe('network request', function() {
   function getRequest() {
     const req = new NetworkRequest();
     req.transferSize = 100;
-    req.responseHeaders = [{name: 'X-TotalFetchedSize', value: 10}];
+    req.responseHeaders = [{name: NetworkRequest.HEADER_FETCHED_SIZE, value: 10}];
     return req;
   }
 
@@ -39,7 +39,7 @@ describe('network request', function() {
     it('does nothing if header is non float', function() {
       const req = getRequest();
       global.isLightrider = true;
-      req.responseHeaders = [{name: 'X-TotalFetchedSize', value: 'ten'}];
+      req.responseHeaders = [{name: NetworkRequest.HEADER_FETCHED_SIZE, value: 'ten'}];
 
       assert.equal(req.transferSize, 100);
       req._updateTransferSizeForLightrider();
@@ -85,11 +85,11 @@ describe('network request', function() {
       };
 
       // units = ms
-      req.responseHeaders = [{name: 'X-TotalTime', value: 10000},
-        {name: 'X-TCPTime', value: 5000},
-        {name: 'X-RequestTime', value: 2500},
-        {name: 'X-SSLTime', value: 1000},
-        {name: 'X-ResponseTime', value: 2500}];
+      req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
+        {name: NetworkRequest.HEADER_TCP, value: 5000},
+        {name: NetworkRequest.HEADER_REQ, value: 2500},
+        {name: NetworkRequest.HEADER_SSL, value: 1000},
+        {name: NetworkRequest.HEADER_RES, value: 2500}];
       return req;
     }
 
@@ -100,7 +100,7 @@ describe('network request', function() {
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
-      req._updateFetchStatsForLightrider();
+      req._updateTimingsForLightrider();
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
@@ -109,12 +109,13 @@ describe('network request', function() {
     it('does nothing if no TotalTime', function() {
       const req = getRequest();
       global.isLightrider = true;
-      req.responseHeaders = req.responseHeaders.filter(item => item.name !== 'X-TotalTime');
+      req.responseHeaders = req.responseHeaders.filter(item => item.name
+        !== NetworkRequest.HEADER_TOTAL);
 
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
-      req._updateFetchStatsForLightrider();
+      req._updateTimingsForLightrider();
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
@@ -123,16 +124,16 @@ describe('network request', function() {
     it('does nothing if Header timings don\'t add up', function() {
       const req = getRequest();
       global.isLightrider = true;
-      req.responseHeaders = [{name: 'X-TotalTime', value: 10000},
-        {name: 'X-TCPTime', value: 5001},
-        {name: 'X-RequestTime', value: 2500},
-        {name: 'X-SSLTime', value: 1000},
-        {name: 'X-ResponseTime', value: 2500}];
+      req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
+        {name: NetworkRequest.HEADER_TCP, value: 5001},
+        {name: NetworkRequest.HEADER_REQ, value: 2500},
+        {name: NetworkRequest.HEADER_SSL, value: 1000},
+        {name: NetworkRequest.HEADER_RES, value: 2500}];
 
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
-      req._updateFetchStatsForLightrider();
+      req._updateTimingsForLightrider();
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
@@ -146,10 +147,28 @@ describe('network request', function() {
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
-      req._updateFetchStatsForLightrider();
+      req._updateTimingsForLightrider();
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
+    });
+
+    it('Handles negative timing data', function() {
+      const req = getRequest();
+      global.isLightrider = true;
+      req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
+        {name: NetworkRequest.HEADER_TCP, value: -1},
+        {name: NetworkRequest.HEADER_REQ, value: -1},
+        {name: NetworkRequest.HEADER_SSL, value: -1},
+        {name: NetworkRequest.HEADER_RES, value: 10000}];
+
+      assert.equal(req.startTime, 0);
+      assert.equal(req.endTime, 2);
+      assert.equal(req.responseReceivedTime, 1);
+      req._updateTimingsForLightrider();
+      assert.equal(req.startTime, 0);
+      assert.equal(req.endTime, 10);
+      assert.equal(req.responseReceivedTime, 0);
     });
 
     it('updates fetch stats', function() {
@@ -159,7 +178,7 @@ describe('network request', function() {
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 2);
       assert.equal(req.responseReceivedTime, 1);
-      req._updateFetchStatsForLightrider();
+      req._updateTimingsForLightrider();
       assert.equal(req.startTime, 0);
       assert.equal(req.endTime, 10);
       assert.equal(req.responseReceivedTime, 7.5);
@@ -174,6 +193,43 @@ describe('network request', function() {
         connectEnd: 5000,
         sslStart: 4000,
         sslEnd: 5000,
+        workerStart: -1,
+        workerReady: -1,
+        sendStart: 5000,
+        sendEnd: 5000,
+        pushStart: -1,
+        pushEnd: -1,
+        receiveHeadersEnd: 7500,
+      });
+    });
+
+    it('updates fetch stats except SSL if SLLMs > TCPMs', function() {
+      const req = getRequest();
+      global.isLightrider = true;
+      req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
+        {name: NetworkRequest.HEADER_TCP, value: 5000},
+        {name: NetworkRequest.HEADER_REQ, value: 2500},
+        {name: NetworkRequest.HEADER_SSL, value: 5001},
+        {name: NetworkRequest.HEADER_RES, value: 2500}];
+
+      assert.equal(req.startTime, 0);
+      assert.equal(req.endTime, 2);
+      assert.equal(req.responseReceivedTime, 1);
+      req._updateTimingsForLightrider();
+      assert.equal(req.startTime, 0);
+      assert.equal(req.endTime, 10);
+      assert.equal(req.responseReceivedTime, 7.5);
+      // confirm timings is accurate
+      assert.deepStrictEqual(req.timing, {
+        requestTime: -1,
+        proxyStart: -1,
+        proxyEnd: -1,
+        dnsStart: -1,
+        dnsEnd: -1,
+        connectStart: 0,
+        connectEnd: 5000,
+        sslStart: -1,
+        sslEnd: -1,
         workerStart: -1,
         workerReady: -1,
         sendStart: 5000,

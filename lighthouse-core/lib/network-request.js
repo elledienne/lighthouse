@@ -15,6 +15,13 @@ const URL = require('./url-shim');
 
 const SECURE_SCHEMES = ['data', 'https', 'wss', 'blob', 'chrome', 'chrome-extension', 'about'];
 
+const HEADER_TCP = 'X-TCPTime';
+const HEADER_SSL = 'X-SSLTime';
+const HEADER_REQ = 'X-RequestTime';
+const HEADER_RES = 'X-ResponseTime';
+const HEADER_TOTAL = 'X-TotalTime';
+const HEADER_FETCHED_SIZE = 'X-TotalFetchedSize';
+
 /**
  * @typedef HeaderEntry
  * @property {string} name
@@ -30,10 +37,10 @@ const SECURE_SCHEMES = ['data', 'https', 'wss', 'blob', 'chrome', 'chrome-extens
 
 /**
  * @typedef LightriderStatistics
- * @property {number} endTimeReductionMs
- * @property {number} TCPTime
- * @property {number} requestTime
- * @property {number} responseTime
+ * @property {number} endTimeDeltaMs
+ * @property {number} TCPMs
+ * @property {number} requestMs
+ * @property {number} responseMs
  */
 
 /** @type {SelfMap<LH.Crdp.Page.ResourceType>} */
@@ -56,7 +63,7 @@ const RESOURCE_TYPES = {
   CSPViolationReport: 'CSPViolationReport',
 };
 
-module.exports = class NetworkRequest {
+class NetworkRequest {
   constructor() {
     this.requestId = '';
     this.connectionId = '0';
@@ -216,7 +223,7 @@ module.exports = class NetworkRequest {
 
     this._updateResponseReceivedTimeIfNecessary();
     this._updateTransferSizeForLightrider();
-    this._updateFetchStatsForLightrider();
+    this._updateTimingsForLightrider();
   }
 
   /**
@@ -235,7 +242,7 @@ module.exports = class NetworkRequest {
 
     this._updateResponseReceivedTimeIfNecessary();
     this._updateTransferSizeForLightrider();
-    this._updateFetchStatsForLightrider();
+    this._updateTimingsForLightrider();
   }
 
   /**
@@ -322,6 +329,8 @@ module.exports = class NetworkRequest {
 
     this.responseReceivedTime = Math.min(this.responseReceivedTime, headersReceivedTime);
     this.responseReceivedTime = Math.max(this.responseReceivedTime, this.startTime);
+    // We're only at responseReceived (_onResponse) at this point.
+    // This endTime may be redefined again after onLoading is done.
     this.endTime = Math.max(this.endTime, this.responseReceivedTime);
   }
 
@@ -354,21 +363,26 @@ module.exports = class NetworkRequest {
     // Bail if we somehow already have transfer size data.
     if (!global.isLightrider) return;
 
-    const totalFetchedSize = this.responseHeaders.find(item => item.name === 'X-TotalFetchedSize');
+    const totalFetchedSize = this.responseHeaders.find(item => item.name === HEADER_FETCHED_SIZE);
     // Bail if the header was missing.
     if (!totalFetchedSize) return;
     const floatValue = parseFloat(totalFetchedSize.value);
     // Bail if the header cannot be parsed
     if (isNaN(floatValue)) return;
-     this.transferSize = floatValue;
+    this.transferSize = floatValue;
   }
 
   /**
    * TODO(exterkamp) add explanatory comment.
    */
-  _updateFetchStatsForLightrider() {
-    // Bail if we somehow already have fetch stats.
+  _updateTimingsForLightrider() {
+    // Bail if we aren't in Lightrider.
     if (!global.isLightrider) return;
+
+    // Bail if timing is not initialized.
+    if (!this.timing) {
+      return;
+    }
 
     // For more info on timing nomenclature: https://www.w3.org/TR/resource-timing-2/#processing-model
 
@@ -381,56 +395,56 @@ module.exports = class NetworkRequest {
     //    ▼ ▼     ▼         ▼ ▼ ▼               ▼                ▼
     //    [ [TCP  [   SSL   ] ] [   Request   ] [   Response   ] ]
     //    ▲ ▲     ▲         ▲ ▲ ▲             ▲ ▲              ▲ ▲
-    //    | |     '-SSLTime-' | '-requestTime-' '-responseTime-' |
-    //    | '----TCPTime------'                                  |
+    //    | |     '-SSLMs---' | '-requestMs---' '-responseMs---' |
+    //    | '----TCPMs--------'                                  |
     //    |                                                      |
-    //    '------------------------TotalTime---------------------'
+    //    '------------------------TotalMs-----------------------'
 
-    const totalTimeHeader = this.responseHeaders.find(item => item.name === 'X-TotalTime');
+    const totalHeader = this.responseHeaders.find(item => item.name === HEADER_TOTAL);
     // Bail if there was no totalTime.
-    if (!totalTimeHeader) return;
+    if (!totalHeader) return;
 
-    const totalTime = parseInt(totalTimeHeader.value);
+    const totalMs = parseInt(totalHeader.value);
 
-    const TCPTimeHeader = this.responseHeaders.find(item => item.name === 'X-TCPTime');
-    const requestTimeHeader = this.responseHeaders.find(item => item.name === 'X-RequestTime');
-    const SSLTimeHeader = this.responseHeaders.find(item => item.name === 'X-SSLTime');
-    const responseTimeHeader = this.responseHeaders.find(item => item.name === 'X-ResponseTime');
+    const TCPHeader = this.responseHeaders.find(item => item.name === HEADER_TCP);
+    const requestHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
+    const SSLHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
+    const responseHeader = this.responseHeaders.find(item => item.name === HEADER_RES);
 
-    const TCPTime = TCPTimeHeader === undefined ? 0 : parseInt(TCPTimeHeader.value);
-    const requestTime = requestTimeHeader === undefined ? 0 : parseInt(requestTimeHeader.value);
-    const SSLTime = SSLTimeHeader === undefined ? 0 : parseInt(SSLTimeHeader.value);
-    const responseTime = responseTimeHeader === undefined ? 0 : parseInt(responseTimeHeader.value);
+    // Make sure all Times are initialized and are non-negative.
+    const TCPMs = Math.max(0, TCPHeader === undefined ? 0 : parseInt(TCPHeader.value));
+    const requestMs = Math.max(0, requestHeader === undefined ? 0 : parseInt(requestHeader.value));
+    const SSLMs = Math.max(0, SSLHeader === undefined ? 0 : parseInt(SSLHeader.value));
+    const responseMs = Math.max(0,
+      responseHeader === undefined ? 0 : parseInt(responseHeader.value));
 
     // Bail if the timings don't add up.
-    if (TCPTime + requestTime + responseTime !== totalTime) {
-      return;
-    }
-
-    // Bail if timing is not initialized.
-    if (!this.timing) {
+    if (TCPMs + requestMs + responseMs !== totalMs) {
       return;
     }
 
     const origEnd = this.endTime;
 
-    // EndTime and responseReceivedTime are in seconds, so conversion is necessary
-    this.endTime = this.startTime + (totalTime / 1000);
-    this.responseReceivedTime = this.startTime + ((TCPTime + requestTime) / 1000);
+    // EndTime and responseReceivedTime are in seconds, so conversion is necessary.
+    this.endTime = this.startTime + (totalMs / 1000);
+    this.responseReceivedTime = this.startTime + ((TCPMs + requestMs) / 1000);
 
     this.timing.connectStart = 0;
-    this.timing.connectEnd = TCPTime;
-    this.timing.sslStart = TCPTime - SSLTime;
-    this.timing.sslEnd = TCPTime;
-    this.timing.sendStart = TCPTime;
-    this.timing.sendEnd = TCPTime;
-    this.timing.receiveHeadersEnd = TCPTime + requestTime;
+    this.timing.connectEnd = TCPMs;
+    // Make sure that SSL time is less than or equal to total TCP time.
+    if (SSLMs <= TCPMs) {
+      this.timing.sslStart = TCPMs - SSLMs;
+      this.timing.sslEnd = TCPMs;
+    }
+    this.timing.sendStart = TCPMs;
+    this.timing.sendEnd = TCPMs;
+    this.timing.receiveHeadersEnd = TCPMs + requestMs;
 
     this.lrStatistics = {
-      endTimeReductionMs: (origEnd - this.endTime) * 1000,
-      TCPTime: TCPTime,
-      requestTime: requestTime,
-      responseTime: responseTime,
+      endTimeDeltaMs: (origEnd - this.endTime) * 1000,
+      TCPMs: TCPMs,
+      requestMs: requestMs,
+      responseMs: responseMs,
     };
   }
 
@@ -464,4 +478,13 @@ module.exports = class NetworkRequest {
   static get TYPES() {
     return RESOURCE_TYPES;
   }
-};
+}
+
+NetworkRequest.HEADER_TCP = HEADER_TCP;
+NetworkRequest.HEADER_SSL = HEADER_SSL;
+NetworkRequest.HEADER_REQ = HEADER_REQ;
+NetworkRequest.HEADER_RES = HEADER_RES;
+NetworkRequest.HEADER_TOTAL = HEADER_TOTAL;
+NetworkRequest.HEADER_FETCHED_SIZE = HEADER_FETCHED_SIZE;
+
+module.exports = NetworkRequest;
