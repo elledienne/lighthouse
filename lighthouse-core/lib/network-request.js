@@ -360,7 +360,7 @@ module.exports = class NetworkRequest {
     const floatValue = parseFloat(totalFetchedSize.value);
     // Bail if the header cannot be parsed
     if (isNaN(floatValue)) return;
-    this.transferSize = parseFloat(totalFetchedSize.value);
+     this.transferSize = floatValue;
   }
 
   /**
