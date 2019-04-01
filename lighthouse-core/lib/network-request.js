@@ -28,6 +28,14 @@ const SECURE_SCHEMES = ['data', 'https', 'wss', 'blob', 'chrome', 'chrome-extens
  * @property {string} securityOrigin
  */
 
+/**
+ * @typedef LightriderStatistics
+ * @property {number} endTimeReductionMs
+ * @property {number} TCPTime
+ * @property {number} requestTime
+ * @property {number} responseTime
+ */
+
 /** @type {SelfMap<LH.Crdp.Page.ResourceType>} */
 const RESOURCE_TYPES = {
   XHR: 'XHR',
@@ -72,6 +80,9 @@ module.exports = class NetworkRequest {
     this.resourceSize = 0;
     this.fromDiskCache = false;
     this.fromMemoryCache = false;
+
+    /** @type {LightriderStatistics|undefined} */
+    this.lrStatistics = undefined;
 
     this.finished = false;
     this.requestMethod = '';
@@ -352,6 +363,9 @@ module.exports = class NetworkRequest {
     this.transferSize = parseFloat(totalFetchedSize.value);
   }
 
+  /**
+   * TODO(exterkamp) add explanatory comment.
+   */
   _updateFetchStatsForLightrider() {
     // Bail if we somehow already have fetch stats.
     if (!global.isLightrider) return;
@@ -398,6 +412,8 @@ module.exports = class NetworkRequest {
       return;
     }
 
+    const origEnd = this.endTime;
+
     // EndTime and responseReceivedTime are in seconds, so conversion is necessary
     this.endTime = this.startTime + (totalTime / 1000);
     this.responseReceivedTime = this.startTime + ((TCPTime + requestTime) / 1000);
@@ -409,6 +425,13 @@ module.exports = class NetworkRequest {
     this.timing.sendStart = TCPTime;
     this.timing.sendEnd = TCPTime;
     this.timing.receiveHeadersEnd = TCPTime + requestTime;
+
+    this.lrStatistics = {
+      endTimeReductionMs: (origEnd - this.endTime) * 1000,
+      TCPTime: TCPTime,
+      requestTime: requestTime,
+      responseTime: responseTime,
+    };
   }
 
   /**

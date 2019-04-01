@@ -50,6 +50,7 @@ class NetworkRequests extends Audit {
           statusCode: record.statusCode,
           mimeType: record.mimeType,
           resourceType: record.resourceType,
+          lrStatistics: record.lrStatistics, // Only exists on Lightrider runs
         };
       });
 
@@ -77,6 +78,8 @@ class NetworkRequests extends Audit {
         {key: 'resourceType', itemType: 'text', text: 'Resource Type'},
       ];
 
+      // TODO(exterkamp): fix ts here
+      // @ts-ignore
       const tableDetails = Audit.makeTableDetails(headings, results);
 
       return {
