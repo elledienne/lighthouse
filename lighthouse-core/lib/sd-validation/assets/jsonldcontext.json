@@ -6,52 +6,28 @@
       "@id": "rdf:HTML"
     },
     "@vocab": "http://schema.org/",
-    "schema": "http://schema.org/",
-    "cat": "http://www.w3.org/ns/dcat#",
-    "cc": "http://creativecommons.org/ns#",
-    "cnt": "http://www.w3.org/2008/content#",
-    "ctag": "http://commontag.org/ns#",
-    "dc": "http://purl.org/dc/terms/",
-    "dcat": "http://www.w3.org/ns/dcat#",
-    "dcterms": "http://purl.org/dc/terms/",
-    "describedby": "http://www.w3.org/2007/05/powder-s#describedby",
-    "earl": "http://www.w3.org/ns/earl#",
-    "foaf": "http://xmlns.com/foaf/0.1/",
-    "gldp": "http://www.w3.org/ns/people#",
-    "gr": "http://purl.org/goodrelations/v1#",
-    "grddl": "http://www.w3.org/2003/g/data-view#",
-    "ht": "http://www.w3.org/2006/http#",
-    "ical": "http://www.w3.org/2002/12/cal/icaltzd#",
-    "license": {
-      "@id": "schema:license",
-      "@type": "@id"
-    },
-    "ma": "http://www.w3.org/ns/ma-ont#",
-    "og": "http://ogp.me/ns#",
-    "org": "http://www.w3.org/ns/org#",
-    "owl": "http://www.w3.org/2002/07/owl#",
-    "prov": "http://www.w3.org/ns/prov#",
-    "ptr": "http://www.w3.org/2009/pointers#",
-    "qb": "http://purl.org/linked-data/cube#",
-    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-    "rdfa": "http://www.w3.org/ns/rdfa#",
-    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "rev": "http://purl.org/stuff/rev#",
-    "rif": "http://www.w3.org/2007/rif#",
-    "role": "http://www.w3.org/1999/xhtml/vocab#role",
-    "rr": "http://www.w3.org/ns/r2rml#",
-    "sd": "http://www.w3.org/ns/sparql-service-description#",
-    "sioc": "http://rdfs.org/sioc/ns#",
-    "skos": "http://www.w3.org/2004/02/skos/core#",
-    "skosxl": "http://www.w3.org/2008/05/skos-xl#",
-    "v": "http://rdf.data-vocabulary.org/#",
-    "vcard": "http://www.w3.org/2006/vcard/ns#",
-    "void": "http://rdfs.org/ns/void#",
-    "wdr": "http://www.w3.org/2007/05/powder#",
-    "wdrs": "http://www.w3.org/2007/05/powder-s#",
-    "xhv": "http://www.w3.org/1999/xhtml/vocab#",
     "xml": "http://www.w3.org/XML/1998/namespace",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "eli": "http://data.europa.eu/eli/ontology#",
+    "snomed": "http://purl.bioontology.org/ontology/SNOMEDCT/",
+    "bibo": "http://purl.org/ontology/bibo/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "void": "http://rdfs.org/ns/void#",
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "dctype": "http://purl.org/dc/dcmitype/",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "rdfa": "http://www.w3.org/ns/rdfa#",
     "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "schema": "http://schema.org/",
+    "dct": "http://purl.org/dc/terms/",
+    "dcterms": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd1": "hhttp://www.w3.org/2001/XMLSchema#",
+    "3DModel": {
+      "@id": "schema:3DModel"
+    },
     "AMRadioChannel": {
       "@id": "schema:AMRadioChannel"
     },
@@ -180,6 +156,12 @@
     },
     "Aquarium": {
       "@id": "schema:Aquarium"
+    },
+    "ArchiveComponent": {
+      "@id": "schema:ArchiveComponent"
+    },
+    "ArchiveOrganization": {
+      "@id": "schema:ArchiveOrganization"
     },
     "ArriveAction": {
       "@id": "schema:ArriveAction"
@@ -856,6 +838,9 @@
     "DrawAction": {
       "@id": "schema:DrawAction"
     },
+    "Drawing": {
+      "@id": "schema:Drawing"
+    },
     "DrinkAction": {
       "@id": "schema:DrinkAction"
     },
@@ -912,6 +897,9 @@
     },
     "EducationalAudience": {
       "@id": "schema:EducationalAudience"
+    },
+    "EducationalOccupationalCredential": {
+      "@id": "schema:EducationalOccupationalCredential"
     },
     "EducationalOrganization": {
       "@id": "schema:EducationalOrganization"
@@ -1059,6 +1047,9 @@
     },
     "FailedActionStatus": {
       "@id": "schema:FailedActionStatus"
+    },
+    "False": {
+      "@id": "schema:False"
     },
     "FastFoodRestaurant": {
       "@id": "schema:FastFoodRestaurant"
@@ -1581,6 +1572,9 @@
     },
     "Male": {
       "@id": "schema:Male"
+    },
+    "Manuscript": {
+      "@id": "schema:Manuscript"
     },
     "Map": {
       "@id": "schema:Map"
@@ -2239,6 +2233,9 @@
     "PlasticSurgery": {
       "@id": "schema:PlasticSurgery"
     },
+    "Play": {
+      "@id": "schema:Play"
+    },
     "PlayAction": {
       "@id": "schema:PlayAction"
     },
@@ -2262,6 +2259,9 @@
     },
     "PostalAddress": {
       "@id": "schema:PostalAddress"
+    },
+    "Poster": {
+      "@id": "schema:Poster"
     },
     "PotentialActionStatus": {
       "@id": "schema:PotentialActionStatus"
@@ -2389,6 +2389,9 @@
     "RadiationTherapy": {
       "@id": "schema:RadiationTherapy"
     },
+    "RadioBroadcastService": {
+      "@id": "schema:RadioBroadcastService"
+    },
     "RadioChannel": {
       "@id": "schema:RadioChannel"
     },
@@ -2496,6 +2499,9 @@
     },
     "ResearchProject": {
       "@id": "schema:ResearchProject"
+    },
+    "Researcher": {
+      "@id": "schema:Researcher"
     },
     "Reservation": {
       "@id": "schema:Reservation"
@@ -2662,11 +2668,17 @@
     "ShareAction": {
       "@id": "schema:ShareAction"
     },
+    "SheetMusic": {
+      "@id": "schema:SheetMusic"
+    },
     "ShoeStore": {
       "@id": "schema:ShoeStore"
     },
     "ShoppingCenter": {
       "@id": "schema:ShoppingCenter"
+    },
+    "ShortStory": {
+      "@id": "schema:ShortStory"
     },
     "SingleBlindedTrial": {
       "@id": "schema:SingleBlindedTrial"
@@ -2958,6 +2970,9 @@
     },
     "TripleBlindedTrial": {
       "@id": "schema:TripleBlindedTrial"
+    },
+    "True": {
+      "@id": "schema:True"
     },
     "Tuesday": {
       "@id": "schema:Tuesday"
@@ -3393,6 +3408,9 @@
     "applicableLocation": {
       "@id": "schema:applicableLocation"
     },
+    "applicantLocationRequirements": {
+      "@id": "schema:applicantLocationRequirements"
+    },
     "application": {
       "@id": "schema:application"
     },
@@ -3412,6 +3430,9 @@
     },
     "appliesToPaymentMethod": {
       "@id": "schema:appliesToPaymentMethod"
+    },
+    "archiveHeld": {
+      "@id": "schema:archiveHeld"
     },
     "area": {
       "@id": "schema:area"
@@ -3706,6 +3727,12 @@
     "broadcastServiceTier": {
       "@id": "schema:broadcastServiceTier"
     },
+    "broadcastSignalModulation": {
+      "@id": "schema:broadcastSignalModulation"
+    },
+    "broadcastSubChannel": {
+      "@id": "schema:broadcastSubChannel"
+    },
     "broadcastTimezone": {
       "@id": "schema:broadcastTimezone"
     },
@@ -3741,6 +3768,9 @@
     },
     "byMonthDay": {
       "@id": "schema:byMonthDay"
+    },
+    "callSign": {
+      "@id": "schema:callSign"
     },
     "calories": {
       "@id": "schema:calories"
@@ -3866,6 +3896,9 @@
     "collection": {
       "@id": "schema:collection"
     },
+    "collectionSize": {
+      "@id": "schema:collectionSize"
+    },
     "color": {
       "@id": "schema:color"
     },
@@ -3884,6 +3917,10 @@
     "commentTime": {
       "@id": "schema:commentTime",
       "@type": "Date"
+    },
+    "competencyRequired": {
+      "@id": "schema:competencyRequired",
+      "@type": "@id"
     },
     "competitor": {
       "@id": "schema:competitor"
@@ -4020,6 +4057,10 @@
     },
     "creator": {
       "@id": "schema:creator"
+    },
+    "credentialCategory": {
+      "@id": "schema:credentialCategory",
+      "@type": "@id"
     },
     "creditedTo": {
       "@id": "schema:creditedTo"
@@ -4308,6 +4349,10 @@
     "educationalFramework": {
       "@id": "schema:educationalFramework"
     },
+    "educationalLevel": {
+      "@id": "schema:educationalLevel",
+      "@type": "@id"
+    },
     "educationalRole": {
       "@id": "schema:educationalRole"
     },
@@ -4370,6 +4415,9 @@
     "endDate": {
       "@id": "schema:endDate",
       "@type": "Date"
+    },
+    "endOffset": {
+      "@id": "schema:endOffset"
     },
     "endTime": {
       "@id": "schema:endTime",
@@ -4638,44 +4686,44 @@
     "geo": {
       "@id": "schema:geo"
     },
+    "geoContains": {
+      "@id": "schema:geoContains"
+    },
+    "geoCoveredBy": {
+      "@id": "schema:geoCoveredBy"
+    },
+    "geoCovers": {
+      "@id": "schema:geoCovers"
+    },
+    "geoCrosses": {
+      "@id": "schema:geoCrosses"
+    },
+    "geoDisjoint": {
+      "@id": "schema:geoDisjoint"
+    },
+    "geoEquals": {
+      "@id": "schema:geoEquals"
+    },
+    "geoIntersects": {
+      "@id": "schema:geoIntersects"
+    },
     "geoMidpoint": {
       "@id": "schema:geoMidpoint"
+    },
+    "geoOverlaps": {
+      "@id": "schema:geoOverlaps"
     },
     "geoRadius": {
       "@id": "schema:geoRadius"
     },
+    "geoTouches": {
+      "@id": "schema:geoTouches"
+    },
+    "geoWithin": {
+      "@id": "schema:geoWithin"
+    },
     "geographicArea": {
       "@id": "schema:geographicArea"
-    },
-    "geospatiallyContains": {
-      "@id": "schema:geospatiallyContains"
-    },
-    "geospatiallyCoveredBy": {
-      "@id": "schema:geospatiallyCoveredBy"
-    },
-    "geospatiallyCovers": {
-      "@id": "schema:geospatiallyCovers"
-    },
-    "geospatiallyCrosses": {
-      "@id": "schema:geospatiallyCrosses"
-    },
-    "geospatiallyDisjoint": {
-      "@id": "schema:geospatiallyDisjoint"
-    },
-    "geospatiallyEquals": {
-      "@id": "schema:geospatiallyEquals"
-    },
-    "geospatiallyIntersects": {
-      "@id": "schema:geospatiallyIntersects"
-    },
-    "geospatiallyOverlaps": {
-      "@id": "schema:geospatiallyOverlaps"
-    },
-    "geospatiallyTouches": {
-      "@id": "schema:geospatiallyTouches"
-    },
-    "geospatiallyWithin": {
-      "@id": "schema:geospatiallyWithin"
     },
     "givenName": {
       "@id": "schema:givenName"
@@ -4813,6 +4861,9 @@
     "hiringOrganization": {
       "@id": "schema:hiringOrganization"
     },
+    "holdingArchive": {
+      "@id": "schema:holdingArchive"
+    },
     "homeLocation": {
       "@id": "schema:homeLocation"
     },
@@ -4836,9 +4887,6 @@
     },
     "howPerformed": {
       "@id": "schema:howPerformed"
-    },
-    "httpMethod": {
-      "@id": "schema:httpMethod"
     },
     "iataCode": {
       "@id": "schema:iataCode"
@@ -5072,6 +5120,9 @@
     "itemListOrder": {
       "@id": "schema:itemListOrder"
     },
+    "itemLocation": {
+      "@id": "schema:itemLocation"
+    },
     "itemOffered": {
       "@id": "schema:itemOffered"
     },
@@ -5089,6 +5140,9 @@
     },
     "jobLocation": {
       "@id": "schema:jobLocation"
+    },
+    "jobLocationType": {
+      "@id": "schema:jobLocationType"
     },
     "jobTitle": {
       "@id": "schema:jobTitle"
@@ -5192,6 +5246,10 @@
     "letterer": {
       "@id": "schema:letterer"
     },
+    "license": {
+      "@id": "schema:license",
+      "@type": "@id"
+    },
     "line": {
       "@id": "schema:line"
     },
@@ -5286,6 +5344,9 @@
       "@id": "schema:material",
       "@type": "@id"
     },
+    "materialExtent": {
+      "@id": "schema:materialExtent"
+    },
     "maxPrice": {
       "@id": "schema:maxPrice"
     },
@@ -5332,6 +5393,9 @@
     },
     "membershipNumber": {
       "@id": "schema:membershipNumber"
+    },
+    "membershipPointsEarned": {
+      "@id": "schema:membershipPointsEarned"
     },
     "memoryRequirements": {
       "@id": "schema:memoryRequirements",
@@ -5450,6 +5514,9 @@
     },
     "normalRange": {
       "@id": "schema:normalRange"
+    },
+    "nsn": {
+      "@id": "schema:nsn"
     },
     "numAdults": {
       "@id": "schema:numAdults"
@@ -5655,6 +5722,9 @@
     },
     "partOfTVSeries": {
       "@id": "schema:partOfTVSeries"
+    },
+    "partOfTrip": {
+      "@id": "schema:partOfTrip"
     },
     "participant": {
       "@id": "schema:participant"
@@ -6017,6 +6087,9 @@
     },
     "recipient": {
       "@id": "schema:recipient"
+    },
+    "recognizedBy": {
+      "@id": "schema:recognizedBy"
     },
     "recognizingAuthority": {
       "@id": "schema:recognizingAuthority"
@@ -6394,6 +6467,9 @@
     "sku": {
       "@id": "schema:sku"
     },
+    "slogan": {
+      "@id": "schema:slogan"
+    },
     "smokingAllowed": {
       "@id": "schema:smokingAllowed"
     },
@@ -6479,6 +6555,9 @@
       "@id": "schema:startDate",
       "@type": "Date"
     },
+    "startOffset": {
+      "@id": "schema:startOffset"
+    },
     "startTime": {
       "@id": "schema:startTime",
       "@type": "DateTime"
@@ -6549,6 +6628,9 @@
     },
     "subTest": {
       "@id": "schema:subTest"
+    },
+    "subTrip": {
+      "@id": "schema:subTrip"
     },
     "subjectOf": {
       "@id": "schema:subjectOf"
@@ -6990,6 +7072,66 @@
     },
     "yield": {
       "@id": "schema:yield"
+    },
+    "http://publications.europa.eu/mdr/eli/index.html": {
+      "@id": "http://publications.europa.eu/mdr/eli/index.html"
+    },
+    "httpMethod": {
+      "@id": "schema:httpMethod"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#Automotive_Ontology_Working_Group": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#Automotive_Ontology_Working_Group"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#FIBO": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#FIBO"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#GLEIF": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#GLEIF"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#IIT-CNR.it": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#IIT-CNR.it"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#MBZ": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#MBZ"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#Tourism": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#Tourism"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_ActionCollabClass": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_ActionCollabClass"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_DatasetClass": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_DatasetClass"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_GoodRelationsClass": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_GoodRelationsClass"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_GoodRelationsTerms": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_GoodRelationsTerms"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_LRMIClass": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_LRMIClass"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_QAStackExchange": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_QAStackExchange"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_WikiDoc": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_WikiDoc"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_bibex": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_bibex"
+    },
+    "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_rNews": {
+      "@id": "http://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#source_rNews"
+    },
+    "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#STI_Accommodation_Ontology": {
+      "@id": "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#STI_Accommodation_Ontology"
+    },
+    "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#TP": {
+      "@id": "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#TP"
+    },
+    "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#TP-draws": {
+      "@id": "https://www.w3.org/wiki/WebSchemas/SchemaDotOrgSources#TP-draws"
     }
   }
 }

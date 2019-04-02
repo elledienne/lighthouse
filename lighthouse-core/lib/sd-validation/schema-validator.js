@@ -59,6 +59,8 @@ function validateObjectKeys(typeOrTypes, keys) {
     types = [typeOrTypes];
   } else if (Array.isArray(typeOrTypes)) {
     types = typeOrTypes;
+    const invalidIndex = typeOrTypes.findIndex(s => typeof s !== 'string');
+    if (invalidIndex >= 0) return [`Unknown value type at index ${invalidIndex}`];
   } else {
     return ['Unknown value type'];
   }
@@ -104,6 +106,8 @@ module.exports = function validateSchemaOrg(expandedObj) {
     return errors;
   }
 
+  // If the array only has a single item, treat it as if it was at the root to simplify the error path.
+  // Arrays longer than a single item are handled in `walkObject` below.
   if (Array.isArray(expandedObj) && expandedObj.length === 1) {
     expandedObj = expandedObj[0];
   }

@@ -127,6 +127,23 @@ describe('schema.org validation', () => {
     assert.equal(errors[0].message, 'Unrecognized schema.org type http://schema.org/Cat');
   });
 
+  it('handles arrays of json schemas', async () => {
+    const errors = await validateJSONLD(`[
+      {
+        "@context": "http://schema.org",
+        "@type": "Cat"
+      },
+      {
+        "@context": "http://schema.org",
+        "@type": "Dog"
+      }
+    ]`);
+
+    assert.equal(errors.length, 2);
+    assert.equal(errors[0].message, 'Unrecognized schema.org type http://schema.org/Cat');
+    assert.equal(errors[1].message, 'Unrecognized schema.org type http://schema.org/Dog');
+  });
+
   it('reports unknown types for objects with multiple types', async () => {
     const errors = await validateJSONLD(`{
       "@context": "http://schema.org",

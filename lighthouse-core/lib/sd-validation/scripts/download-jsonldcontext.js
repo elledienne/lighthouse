@@ -13,12 +13,12 @@ const fetch = require('isomorphic-fetch');
 const path = require('path');
 const fs = require('fs');
 
-const SCHEMA_ORG_URL = 'https://schema.org/docs/jsonldcontext.json';
+const SCHEMA_ORG_URL = 'https://schema.org';
 const CONTEXT_FILE = path.join(__dirname, '../assets/jsonldcontext.json');
 
 async function run() {
   try {
-    const response = await fetch(SCHEMA_ORG_URL);
+    const response = await fetch(SCHEMA_ORG_URL, {headers: {Accept: 'application/ld+json'}});
     const data = await response.json();
     fs.writeFileSync(CONTEXT_FILE, JSON.stringify(data, null, 2));
     console.log('Success.'); // eslint-disable-line no-console
