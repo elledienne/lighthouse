@@ -418,14 +418,14 @@ class NetworkRequest {
 
     const TCPMsHeader = this.responseHeaders.find(item => item.name === HEADER_TCP);
     const requestMsHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
-    const SSLMsHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
+    // const SSLMsHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
     const responseMsHeader = this.responseHeaders.find(item => item.name === HEADER_RES);
 
     // TODO(exterkamp): NaN checking
     // Make sure all Times are initialized and are non-negative.
     const TCPMs = TCPMsHeader ? Math.max(0, parseInt(TCPMsHeader.value)) : 0;
     const requestMs = requestMsHeader ? Math.max(0, parseInt(requestMsHeader.value)) : 0;
-    const SSLMs = SSLMsHeader ? Math.max(0, parseInt(SSLMsHeader.value)) : 0;
+    // const SSLMs = SSLMsHeader ? Math.max(0, parseInt(SSLMsHeader.value)) : 0;
     const responseMs = responseMsHeader ? Math.max(0, parseInt(responseMsHeader.value)) : 0;
 
     // Bail if the timings don't add up.
