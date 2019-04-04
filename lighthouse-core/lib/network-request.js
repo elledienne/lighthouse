@@ -15,11 +15,13 @@ const URL = require('./url-shim');
 
 const SECURE_SCHEMES = ['data', 'https', 'wss', 'blob', 'chrome', 'chrome-extension', 'about'];
 
-const HEADER_TCP = 'X-TCPTime';
-const HEADER_SSL = 'X-SSLTime';
-const HEADER_REQ = 'X-RequestTime';
-const HEADER_RES = 'X-ResponseTime';
-const HEADER_TOTAL = 'X-TotalTime';
+// Lightrider X-Header names for timing information.
+// See: _updateTransferSizeForLightrider & _updateTimingsForLightrider.
+const HEADER_TCP = 'X-TCPMs';
+const HEADER_SSL = 'X-SSLMs';
+const HEADER_REQ = 'X-RequestMs';
+const HEADER_RES = 'X-ResponseMs';
+const HEADER_TOTAL = 'X-TotalMs';
 const HEADER_FETCHED_SIZE = 'X-TotalFetchedSize';
 
 /**
@@ -37,9 +39,13 @@ const HEADER_FETCHED_SIZE = 'X-TotalFetchedSize';
 
 /**
  * @typedef LightriderStatistics
+ * The difference in endTime between the observed Lighthouse endTime and Lightrider's derived endTime.
  * @property {number} endTimeDeltaMs
+ * The time spent making a TCP connection (connect + SSL).
  * @property {number} TCPMs
+ * The time spent requesting a resource from a remote server, we use this to approx RTT.
  * @property {number} requestMs
+ * The time spent transferring a resource from a remote server.
  * @property {number} responseMs
  */
 
@@ -88,6 +94,7 @@ class NetworkRequest {
     this.fromDiskCache = false;
     this.fromMemoryCache = false;
 
+    // Statistics to be passed to Lightrider from _updateTimingsForLightrider.
     /** @type {LightriderStatistics|undefined} */
     this.lrStatistics = undefined;
 
@@ -373,7 +380,10 @@ class NetworkRequest {
   }
 
   /**
-   * TODO(exterkamp) add explanatory comment.
+   * LR gets additional, accurate timing information from its underlying fetch infrastructure.  This
+   * is passed in via X-Headers similar to 'X-TotalFetchedSize'.
+   *
+   * TODO(exterkamp): Uncomment breaking code and apply these timings.
    */
   _updateTimingsForLightrider() {
     // Bail if we aren't in Lightrider.
@@ -406,22 +416,26 @@ class NetworkRequest {
 
     const totalMs = parseInt(totalHeader.value);
 
-    const TCPHeader = this.responseHeaders.find(item => item.name === HEADER_TCP);
-    const requestHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
-    const SSLHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
-    const responseHeader = this.responseHeaders.find(item => item.name === HEADER_RES);
+    const TCPMsHeader = this.responseHeaders.find(item => item.name === HEADER_TCP);
+    const requestMsHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
+    const SSLMsHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
+    const responseMsHeader = this.responseHeaders.find(item => item.name === HEADER_RES);
 
+    // TODO(exterkamp): NaN checking
     // Make sure all Times are initialized and are non-negative.
-    const TCPMs = Math.max(0, TCPHeader === undefined ? 0 : parseInt(TCPHeader.value));
-    const requestMs = Math.max(0, requestHeader === undefined ? 0 : parseInt(requestHeader.value));
-    const SSLMs = Math.max(0, SSLHeader === undefined ? 0 : parseInt(SSLHeader.value));
-    const responseMs = Math.max(0,
-      responseHeader === undefined ? 0 : parseInt(responseHeader.value));
+    const TCPMs = TCPMsHeader ? Math.max(0, parseInt(TCPMsHeader.value)) : 0;
+    const requestMs = requestMsHeader ? Math.max(0, parseInt(requestMsHeader.value)) : 0;
+    const SSLMs = SSLMsHeader ? Math.max(0, parseInt(SSLMsHeader.value)) : 0;
+    const responseMs = responseMsHeader ? Math.max(0, parseInt(responseMsHeader.value)) : 0;
 
     // Bail if the timings don't add up.
     if (TCPMs + requestMs + responseMs !== totalMs) {
       return;
     }
+
+    /*
+    THIS CODE CONTAINS BREAKING CHANGES.  ADDING THESE TIMINGS CAN/WILL
+    HAVE AN EFFECT ON PERFORMANCE.  UNCOMMENT AT YOUR OWN RISK.
 
     const origEnd = this.endTime;
 
@@ -439,9 +453,10 @@ class NetworkRequest {
     this.timing.sendStart = TCPMs;
     this.timing.sendEnd = TCPMs;
     this.timing.receiveHeadersEnd = TCPMs + requestMs;
+    */
 
     this.lrStatistics = {
-      endTimeDeltaMs: (origEnd - this.endTime) * 1000,
+      endTimeDeltaMs: (this.endTime - (this.startTime + (totalMs / 1000))) * 1000,
       TCPMs: TCPMs,
       requestMs: requestMs,
       responseMs: responseMs,

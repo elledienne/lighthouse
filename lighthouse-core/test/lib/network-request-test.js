@@ -153,7 +153,7 @@ describe('network request', function() {
       assert.equal(req.responseReceivedTime, 1);
     });
 
-    it('Handles negative timing data', function() {
+    it.skip('Handles negative timing data', function() {
       const req = getRequest();
       global.isLightrider = true;
       req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
@@ -171,7 +171,7 @@ describe('network request', function() {
       assert.equal(req.responseReceivedTime, 0);
     });
 
-    it('updates fetch stats', function() {
+    it.skip('updates fetch stats', function() {
       const req = getRequest();
       global.isLightrider = true;
 
@@ -203,7 +203,7 @@ describe('network request', function() {
       });
     });
 
-    it('updates fetch stats except SSL if SLLMs > TCPMs', function() {
+    it.skip('updates fetch stats except SSL if SLLMs > TCPMs', function() {
       const req = getRequest();
       global.isLightrider = true;
       req.responseHeaders = [{name: NetworkRequest.HEADER_TOTAL, value: 10000},
