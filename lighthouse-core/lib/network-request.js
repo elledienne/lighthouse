@@ -37,6 +37,18 @@ const HEADER_FETCHED_SIZE = 'X-TotalFetchedSize';
  * @property {string} securityOrigin
  */
 
+/**
+ * @typedef LightriderStatistics
+ * The difference in endTime between the observed Lighthouse endTime and Lightrider's derived endTime.
+ * @property {number} endTimeDeltaMs
+ * The time spent making a TCP connection (connect + SSL).
+ * @property {number} TCPMs
+ * The time spent requesting a resource from a remote server, we use this to approx RTT.
+ * @property {number} requestMs
+ * The time spent transferring a resource from a remote server.
+ * @property {number} responseMs
+ */
+
 /** @type {SelfMap<LH.Crdp.Page.ResourceType>} */
 const RESOURCE_TYPES = {
   XHR: 'XHR',
@@ -83,14 +95,8 @@ class NetworkRequest {
     this.fromMemoryCache = false;
 
     // Statistics to be passed to Lightrider from _updateTimingsForLightrider.
-    /** @type {number|undefined} The difference in endTime between the observed Lighthouse endTime and Lightrider's derived endTime. */
-    this.endTimeDeltaMs = undefined;
-    /** @type {number|undefined} The time spent making a TCP connection (connect + SSL). */
-    this.TCPMs = undefined;
-    /** @type {number|undefined} The time spent requesting a resource from a remote server, we use this to approx RTT. */
-    this.requestMs = undefined;
-    /** @type {number|undefined} The time spent transferring a resource from a remote server. */
-    this.responseMs = undefined;
+    /** @type {LightriderStatistics|undefined} */
+    this.lrStatistics = undefined;
 
     this.finished = false;
     this.requestMethod = '';
@@ -453,10 +459,12 @@ class NetworkRequest {
     this.timing.receiveHeadersEnd = TCPMs + requestMs;
     */
 
-    this.endTimeDeltaMs = (this.endTime - (this.startTime + (totalMs / 1000))) * 1000;
-    this.TCPMs = TCPMs;
-    this.requestMs = requestMs;
-    this.responseMs = responseMs;
+    this.lrStatistics = {
+      endTimeDeltaMs: (this.endTime - (this.startTime + (totalMs / 1000))) * 1000,
+      TCPMs: TCPMs,
+      requestMs: requestMs,
+      responseMs: responseMs,
+    };
   }
 
   /**
