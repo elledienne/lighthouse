@@ -382,9 +382,6 @@ class NetworkRequest {
   /**
    * LR gets additional, accurate timing information from its underlying fetch infrastructure.  This
    * is passed in via X-Headers similar to 'X-TotalFetchedSize'.
-   *
-   * TODO(exterkamp): Uncomment breaking code and apply these timings.
-   * see: https://github.com/GoogleChrome/lighthouse/issues/7752
    */
   _updateTimingsForLightrider() {
     // Bail if we aren't in Lightrider.
@@ -416,17 +413,16 @@ class NetworkRequest {
     if (!totalHeader) return;
 
     const totalMs = parseInt(totalHeader.value);
-
     const TCPMsHeader = this.responseHeaders.find(item => item.name === HEADER_TCP);
-    const requestMsHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
     const SSLMsHeader = this.responseHeaders.find(item => item.name === HEADER_SSL);
+    const requestMsHeader = this.responseHeaders.find(item => item.name === HEADER_REQ);
     const responseMsHeader = this.responseHeaders.find(item => item.name === HEADER_RES);
 
     // TODO(exterkamp): NaN checking
     // Make sure all Times are initialized and are non-negative.
     const TCPMs = TCPMsHeader ? Math.max(0, parseInt(TCPMsHeader.value)) : 0;
+    const SSLMs = SSLMsHeader ? Math.max(0, parseInt(SSLMsHeader.value)) : 0;
     const requestMs = requestMsHeader ? Math.max(0, parseInt(requestMsHeader.value)) : 0;
-    const _/** SSLMs */ = SSLMsHeader ? Math.max(0, parseInt(SSLMsHeader.value)) : 0;
     const responseMs = responseMsHeader ? Math.max(0, parseInt(responseMsHeader.value)) : 0;
 
     // Bail if the timings don't add up.
@@ -434,30 +430,10 @@ class NetworkRequest {
       return;
     }
 
-    /*
-    This code will change performance scores.  The current Lighthouse version is 4.x,
-    and does not take into account these changes.  In order to uncomment and apply these
-    changes the main version number will need to be bumped to 5.x+.
-
-    See: https://github.com/GoogleChrome/lighthouse/issues/7752
-
-    const origEnd = this.endTime;
-
-    // EndTime and responseReceivedTime are in seconds, so conversion is necessary.
-    this.endTime = this.startTime + (totalMs / 1000);
-    this.responseReceivedTime = this.startTime + ((TCPMs + requestMs) / 1000);
-
-    this.timing.connectStart = 0;
-    this.timing.connectEnd = TCPMs;
-    // Make sure that SSL time is less than or equal to total TCP time.
-    if (SSLMs <= TCPMs) {
-      this.timing.sslStart = TCPMs - SSLMs;
-      this.timing.sslEnd = TCPMs;
+    // Bail if SSL time is > TCP time.
+    if (SSLMs > TCPMs) {
+      return;
     }
-    this.timing.sendStart = TCPMs;
-    this.timing.sendEnd = TCPMs;
-    this.timing.receiveHeadersEnd = TCPMs + requestMs;
-    */
 
     this.lrStatistics = {
       endTimeDeltaMs: (this.endTime - (this.startTime + (totalMs / 1000))) * 1000,
