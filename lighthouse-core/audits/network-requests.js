@@ -55,10 +55,10 @@ class NetworkRequests extends Audit {
           statusCode: record.statusCode,
           mimeType: record.mimeType,
           resourceType: record.resourceType,
-          endTimeDeltaMs: endTimeDeltaMs, // Only exists on Lightrider runs
-          TCPMs: TCPMs, // Only exists on Lightrider runs
-          requestMs: requestMs, // Only exists on Lightrider runs
-          responseMs: responseMs, // Only exists on Lightrider runs
+          lrEndTimeDeltaMs: endTimeDeltaMs, // Only exists on Lightrider runs
+          lrTCPMs: TCPMs, // Only exists on Lightrider runs
+          lrRequestMs: requestMs, // Only exists on Lightrider runs
+          lrResponseMs: responseMs, // Only exists on Lightrider runs
         };
       });
 
